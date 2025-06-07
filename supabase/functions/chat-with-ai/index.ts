@@ -39,8 +39,10 @@ serve(async (req) => {
       );
     }
 
-    // Call Google Gemini API
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`, {
+    console.log('Calling Gemini API with message:', message);
+
+    // Call Google Gemini API with the correct endpoint
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${geminiApiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,12 +56,16 @@ serve(async (req) => {
       })
     });
 
+    console.log('Gemini API response status:', geminiResponse.status);
+
     if (!geminiResponse.ok) {
-      throw new Error(`Gemini API error: ${geminiResponse.status}`);
+      const errorText = await geminiResponse.text();
+      console.error('Gemini API error response:', errorText);
+      throw new Error(`Gemini API error: ${geminiResponse.status} - ${errorText}`);
     }
 
     const geminiData = await geminiResponse.json();
-    console.log('Gemini API response:', geminiData);
+    console.log('Gemini API response data:', geminiData);
 
     let response = "I'm sorry, I couldn't generate a response at this time.";
     
